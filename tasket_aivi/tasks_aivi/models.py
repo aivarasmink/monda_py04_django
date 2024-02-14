@@ -8,21 +8,21 @@ class Project(models.Model):
     name = models.CharField(_("name"), max_length=100, db_index=True)
     owner = models.ForeignKey(
         get_user_model(), 
-        on_delete=models.CASCADE, 
-        verbose_name=_("owner"), 
+        verbose_name=_("owner"),
+        on_delete=models.CASCADE,  
         related_name='projects',
     )
 
     class Meta:
-            verbose_name = _("Project")
-            verbose_name_plural = _("Projects")
+            verbose_name = _("project")
+            verbose_name_plural = _("projects")
             ordering = ['name']
     
     def __str__(self):
-            return self.name
+         return self.name
     
     def get_absolute_url(self):
-            return reverse("Project_detail", kwargs={"pk": self.pk})
+        return reverse("Project_detail", kwargs={"pk": self.pk})
     
 
 class Task(models.Model):
@@ -35,13 +35,11 @@ class Task(models.Model):
           related_name='tasks',
     )
 
-    owner = models.ForeignKey(get_user_model(), verbose_name=_("owner"), on_delete=models.CASCADE, related_name='tasks')
     created_at = models.DateTimeField(_("created at"), auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True, db_index=True)
     is_done = models.BooleanField(_("is done"), default=False, db_index=True)
     deadline = models.DateTimeField(_("deadline"), null=True, blank=True, db_index=True)
 
-    
 
     class Meta:
         verbose_name = _("task")
