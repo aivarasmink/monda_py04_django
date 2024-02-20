@@ -39,6 +39,7 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ['name', 'description', 'project__name', 'owner__last_name', 'owner__username']
     list_editable = ['is_done']
     readonly_fields = ['created_at', 'updated_at', 'id']
+    autocomplete_fields = ['project', 'owner']
     fieldsets = (
         (_("general").title(), {
             "fields": (
