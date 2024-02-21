@@ -74,8 +74,30 @@ def index(request: HttpRequest) -> HttpResponse:
     return render(request, 'tasks/index.html', context)
 
 def task_list(request: HttpRequest) -> HttpResponse:
-    return render(request, 'tasks/task_list.html', {'tasks_list': models.Task.objects.all(),})
-
+    queryset = models.Task.objects
+    owner_username = request.GET.get('owner')
+    if owner_username:
+        owner = get_object_or_404(get_user_model(), username=owner_username)
+        queryset = queryset.filter(owner=owner)
+        projects = models.Project.objects.filter(owner=owner)
+    elif request.user.is_authenticated:
+        projects = models.Project.objects.filter(owner=request.user)
+    else:
+        projects = models.Project.objects
+    project_pk = request.GET.get('project_pk')
+    if project_pk:
+        project = get_object_or_404(models.Project, pk=project_pk)
+        queryset = queryset.filter(project=project)
+    search_name = request.GET.get('search_name')
+    if search_name:
+        queryset = queryset.filter(name__icontains=search_name)
+    context = {
+        'task_list': queryset.all(),
+        'project_list': projects.all(),
+        'user_list': get_user_model().objects.all().order_by('username'),
+        'next': reverse('task_list') + '?' + '&'.join([f"{key}={value}" for key, value in request.GET.items()]),
+    }
+    return render(request, 'tasks/task_list.html', context)
 def task_detail(request: HttpRequest, pk: int) -> HttpResponse:
     return render(request, 'tasks/task_detail.html', {'task': get_object_or_404(models.Task, pk=pk)})
 
@@ -92,3 +114,20 @@ def task_done(request: HttpRequest, pk: int) -> HttpResponse:
     if request.GET.get('next'):
         return redirect(request.GET.get('next'))
     return redirect(task_list)
+
+@login_required
+def task_create(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = forms.TaskForm(request.POST)
+        if form.is_valid():
+            form.instance.owner = request.user
+            form.save()
+            messages.success(request, _("task created successfully").capitalize())
+            if request.GET.get('next'):
+                return redirect(request.GET.get('next'))
+            return redirect('task_list')
+    else:
+        form = forms.TaskForm()
+        from.fields['next'].value = request.GET.get('next')
+        form.fields['project'].queryset = form.fields['project'].queryset.filter(owner=request.user)
+    return render(request, 'tasks/task_create.html', {'form': form})
