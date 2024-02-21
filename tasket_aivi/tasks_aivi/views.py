@@ -103,16 +103,22 @@ def task_detail(request: HttpRequest, pk: int) -> HttpResponse:
 
 def task_done(request: HttpRequest, pk: int) -> HttpResponse:
     task = get_object_or_404(models.Task, pk=pk)
-    task.is_done = not task.is_done
-    task.save()
-    messages.success(request, "{} {} {} {}".format(
-        _("Task").capitalize(),
-        task.name,
-        _("marked as"),
-        _("done") if task.is_done else _("not done")
-    ))
+    if request.user in [task.owner, task.project.owner]:
+        task.is_done = not task.is_done
+        task.save()
+        messages.success(request, "{} {} {} {}".format(
+            _("Task").capitalize(),
+            task.name,
+            _("marked as"),
+            _("done") if task.is_done else _("not done")
+        ))
+    else:
+        messages.error(request, "{}: {}".format(
+            _("permission error").title(),
+            _("you must be the owner of either the task itelf or it's project"),
+        ))
     if request.GET.get('next'):
-        return redirect(request.GET.get('next'))
+            return redirect(request.GET.get('next'))
     return redirect(task_list)
 
 @login_required
@@ -131,3 +137,26 @@ def task_create(request: HttpRequest) -> HttpResponse:
         from.fields['next'].value = request.GET.get('next')
         form.fields['project'].queryset = form.fields['project'].queryset.filter(owner=request.user)
     return render(request, 'tasks/task_create.html', {'form': form})
+
+@login_required
+def task_update(request: HttpRequest, pk: int) -> HttpResponse:
+    task = get_object_or_404(models.Task, pk=pk, owner=request.user)
+    if request.method == "POST":
+        form = forms.TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("task edited successfully"))
+            return redirect('task_detail', pk=pk)
+    else:
+        form = forms.TaskForm(instance=task)
+    form.fields['project'].queryset = form.fields['project'].queryset.filter(owner=request.user)
+    return render(request, 'tasks/task_update.html', {'form': form})
+
+@login_required
+def task_delete(request: HttpRequest, pk: int) -> HttpResponse:
+    task = get_object_or_404(models.Task, pk=pk, owner=request.user)
+    if request.method == "POST":
+        task.delete()
+        messages.success(request, _("task deleted successfully"))
+        return redirect('task_list')
+    return render(request, 'tasks/task_delete.html', {'task': task, 'object': task})
