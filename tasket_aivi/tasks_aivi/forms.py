@@ -2,8 +2,14 @@ from django import forms
 from . import models
 
 
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+
 class TaskForm(forms.ModelForm):
-    next = forms.CharField(widget=forms.HiddenInput(), required=False)
     class Meta:
         model = models.Task
-        fields = ('name', 'project', 'description', 'deadline', 'is_done' )
+        fields = ('name', 'project', 'description', 'deadline', 'is_done', )
+        widgets = {
+            'deadline': DateInput,
+        }
