@@ -5,7 +5,4 @@ from django.utils.translation import gettext_lazy as _
 class TasksConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'tasks_aivi'
-
-
-    class Meta:
-        verbose_name = _('Tasks_Aivi')
+    verbose_name = _('Tasks_Aivi')

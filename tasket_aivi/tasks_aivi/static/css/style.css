@@ -52,6 +52,7 @@ header ul.nav li a:hover, header ul.nav li form button:hover {
 
 main {
     flex-grow: 1;
+    background-color: #888888;
 }
 
 footer {
@@ -141,6 +142,40 @@ main form label {
     display: inline-block;
     min-width: 20vw;
     font-size: 120%;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+header form select {
+    margin: 1rem;
+    font-size: 100%;
+}
+
+div.flower {
+    display: inline-block;
+    border: 2px solid #ffcc00;
+    border-radius: 1rem;
+    margin: 1rem;
+}
+
+div.fog {
+    background-color: #ffffff9f;
+    display: inline-block;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+footer .icon {
+    max-height: 24px;
+}
+
+main form label {
+    display: inline-block;
+    width: 20vw;
+    min-width: 15rem;
+    font-size: 120%;
+    border-bottom: 1px dotted #999999;
 }
 
 main form input, 

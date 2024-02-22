@@ -15,7 +15,7 @@ from . import models, forms
 
 class ProjectListView(generic.ListView):
     model = models.Project
-    template_name = 'tasks/project_list.html'
+    template_name = 'tasks_aivi/project_list.html'
 
 
     def get_queryset(self) -> QuerySet[Any]:
@@ -32,11 +32,11 @@ class ProjectListView(generic.ListView):
 
 class ProjectDetailView(generic.DetailView):
     model = models.Project
-    template_name = 'tasks/project_detail.html'
+    template_name = 'tasks_aivi/project_detail.html'
 
 class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     model = models.Project
-    template_name = 'tasks/project_create.html'
+    template_name = 'tasks_aivi/project_create.html'
     fields = ('name', )
 
     def get_success_url(self) -> str:
@@ -54,7 +54,7 @@ class ProjectUpdateView(
         generic.UpdateView
     ):
     model = models.Project
-    template_name = 'tasks/project_update.html'
+    template_name = 'tasks_aivi/project_update.html'
     fields = ('name', )
 
     def get_success_url(self) -> str:
@@ -125,7 +125,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'user_dashboard': user_dashboard,
         'undone_tasks': undone_tasks,
     }
-    return render(request, 'tasks/index.html', context)
+    return render(request, 'tasks_aivi/index.html', context)
 
 def task_list(request: HttpRequest) -> HttpResponse:
     queryset = models.Task.objects
@@ -152,6 +152,7 @@ def task_list(request: HttpRequest) -> HttpResponse:
         'next': reverse('task_list') + '?' + '&'.join([f"{key}={value}" for key, value in request.GET.items()]),
     }
     return render(request, 'tasks/task_list.html', context)
+
 def task_detail(request: HttpRequest, pk: int) -> HttpResponse:
     return render(request, 'tasks/task_detail.html', {'task': get_object_or_404(models.Task, pk=pk)})
 
@@ -188,9 +189,8 @@ def task_create(request: HttpRequest) -> HttpResponse:
             return redirect('task_list')
     else:
         form = forms.TaskForm()
-        from.fields['next'].value = request.GET.get('next')
         form.fields['project'].queryset = form.fields['project'].queryset.filter(owner=request.user)
-    return render(request, 'tasks/task_create.html', {'form': form})
+    return render(request, 'tasks_aivi/task_create.html', {'form': form})
 
 @login_required
 def task_update(request: HttpRequest, pk: int) -> HttpResponse:
@@ -212,5 +212,7 @@ def task_delete(request: HttpRequest, pk: int) -> HttpResponse:
     if request.method == "POST":
         task.delete()
         messages.success(request, _("task deleted successfully"))
+        if request.GET.get('next'):
+            return redirect(request.GET.get('next'))
         return redirect('task_list')
     return render(request, 'tasks/task_delete.html', {'task': task, 'object': task})

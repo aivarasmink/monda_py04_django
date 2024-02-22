@@ -34,7 +34,12 @@ class Task(models.Model):
           on_delete=models.CASCADE,
           related_name='tasks',
     )
-
+    owner = models.ForeignKey(
+        get_user_model(), 
+        verbose_name=_("owner"), 
+        on_delete=models.CASCADE,
+        related_name='tasks_aivi'
+    )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True, db_index=True)
     is_done = models.BooleanField(_("is done"), default=False, db_index=True)
@@ -43,7 +48,7 @@ class Task(models.Model):
 
     class Meta:
         verbose_name = _("task")
-        verbose_name_plural = _("tasks")
+        verbose_name_plural = _("tasks_aivi")
         ordering = ['is_done', 'created_at']
 
     def __str__(self):

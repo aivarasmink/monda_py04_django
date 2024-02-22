@@ -1,18 +1,16 @@
 {% extends "base.html" %}{% load i18n %}
-{% block title %}{% trans "deleting"|capfirst %} {{ project.name }} | {{ block.super }}{% endblock title %}
+{% block title %}{% trans "deleting"|capfirst %} {{ task.name }} | {{ block.super }}{% endblock title %}
 {% block content %}
-<h1>{% trans "deleting project"|capfirst %} {{ project.name }}</h1>
-<form method="post" action="{{ request.path }}?next={{ request.Get.next|urlencode }}">
+<h1>{% trans "deleting task"|capfirst %} {{ task.name }}</h1>
+<form method="post" action="{{ request.path }}?next={{ request.GET.next|urlencode }}">
     {% csrf_token %}
     <p>
-        {% trans "are you sure you want to delete project" %}
-        {{ project.name }}? 
-        {% trans "all project's"|capfirst %} {{ project.tasks.count }}
-        {% trans "tasks will be deleted" %}.
+        {% trans "are you sure you want to delete task" %}
+        {{ task.name }}? 
     </p>
     <p>
         <button type="submit">{% trans "confirm"|capfirst %}</button>
-        <a class="button" href="{% url "project_detail" project.pk %}?next={{ request.Get.next|urlencode }}">{% trans "change mind"|capfirst %}</a>
+        <a class="button" href="{% url "task_detail" task.pk %}?next={{ request.GET.next|urlencode }}">{% trans "change mind"|capfirst %}</a>
     </p>
 </form>
 {% endblock content %}
