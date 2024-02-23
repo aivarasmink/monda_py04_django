@@ -3,7 +3,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from PIL import Image
+from PIL import Image 
+
 
 
 class Profile(models.Model):
